@@ -1,30 +1,30 @@
-# FirstShift Railway Configuration
+# FirstShift Railway Deployment Guide
 # https://docs.railway.app/reference/config-as-code
 #
-# Deploy: Connect this repo in the Railway dashboard.
-# Railway provides managed MySQL — add a MySQL plugin from the dashboard.
-# The MYSQL_* variables are auto-injected when the plugin is attached.
-
-[build]
-# Railway detects Dockerfiles automatically per service.
-
-[deploy]
-healthcheckPath = "/"
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 3
-
-# Service: firstshift-api
-# Dockerfile: services/api/Dockerfile
-# Build context: services/api
-# Environment variables (set in Railway dashboard):
-#   SPRING_PROFILES_ACTIVE=docker
-#   SPRING_DATASOURCE_URL=jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{MySQL.MYSQLDATABASE}}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf-8
-#   SPRING_DATASOURCE_USERNAME=${{MySQL.MYSQLUSER}}
-#   SPRING_DATASOURCE_PASSWORD=${{MySQL.MYSQLPASSWORD}}
-#   JWT_SECRET_KEY=<generate-a-strong-secret>
-
-# Service: firstshift-admin
-# Dockerfile: services/admin-web/Dockerfile
-# Build context: services/admin-web
-# Environment variables:
-#   API_URL=http://firstshift-api.railway.internal:8080
+# Railway requires multi-service setup via the dashboard for mono-repos.
+# This file documents the configuration for each service.
+#
+# Steps:
+# 1. Create a new Railway project and connect this GitHub repo
+# 2. Add a MySQL plugin from the dashboard (auto-provisions MYSQL_* variables)
+# 3. Create two services manually (see below)
+# 4. Set environment variables per service in the dashboard
+#
+# === Service 1: firstshift-api ===
+# Root Directory:   services/api
+# Builder:          Dockerfile
+# Port:             8080
+# Health Check:     /actuator/health
+# Environment Variables:
+#   SPRING_PROFILES_ACTIVE = docker
+#   SPRING_DATASOURCE_URL = jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{MySQL.MYSQLDATABASE}}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf-8
+#   SPRING_DATASOURCE_USERNAME = ${{MySQL.MYSQLUSER}}
+#   SPRING_DATASOURCE_PASSWORD = ${{MySQL.MYSQLPASSWORD}}
+#   JWT_SECRET_KEY = <generate-a-strong-secret>
+#
+# === Service 2: firstshift-admin ===
+# Root Directory:   services/admin-web
+# Builder:          Dockerfile
+# Port:             3000
+# Environment Variables:
+#   API_URL = http://firstshift-api.railway.internal:8080
