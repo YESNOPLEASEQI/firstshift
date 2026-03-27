@@ -1,0 +1,60 @@
+# FirstShift Full Stack (DB + API + Admin Web)
+# Usage: docker compose -f docker-compose.full.yml up --build
+# Copy .env.example to .env and edit before running.
+#
+# Note: The mobile app (services/app) is NOT containerized.
+# Run it separately with: cd services/app && npx expo start
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: firstshift-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-firstshift}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-firstshift}
+      MYSQL_USER: ${MYSQL_USER:-firstshift}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-firstshift}
+    ports:
+      - "3306:3306"
+    volumes:
+      - firstshift_dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-firstshift}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: services/api
+      dockerfile: Dockerfile
+    container_name: firstshift-api
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-firstshift}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf-8
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-firstshift}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-firstshift}
+      JWT_SECRET_KEY: ${JWT_SECRET:-dev-secret-do-not-use-in-prod}
+    ports:
+      - "8080:8080"
+
+  admin-web:
+    build:
+      context: services/admin-web
+      dockerfile: Dockerfile
+    container_name: firstshift-admin
+    restart: always
+    depends_on:
+      - api
+    environment:
+      API_URL: http://api:8080
+    ports:
+      - "3000:3000"
+
+volumes:
+  firstshift_dbdata:

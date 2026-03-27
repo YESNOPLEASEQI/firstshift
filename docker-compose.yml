@@ -1,0 +1,27 @@
+# FirstShift Development Database
+# Usage: docker compose up -d
+# This starts only MySQL for local development.
+# API and admin-web run natively (./gradlew bootRun, yarn dev).
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: firstshift-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-firstshift}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-firstshift}
+      MYSQL_USER: ${MYSQL_USER:-firstshift}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-firstshift}
+    ports:
+      - "3306:3306"
+    volumes:
+      - firstshift_dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-firstshift}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  firstshift_dbdata:
