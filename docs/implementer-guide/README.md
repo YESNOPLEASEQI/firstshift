@@ -19,7 +19,7 @@ Make sure FirstShift is already deployed and running. If you have not deployed y
 
 You will need:
 - The URL of your admin dashboard (e.g., `https://admin.yourorg.example.com`)
-- An admin username and password (default: `admin` / `admin`)
+- An admin username and password supplied by your deployment operator or selected for the explicit local bootstrap
 
 ## How This Guide Is Organized
 
