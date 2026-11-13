@@ -6,15 +6,14 @@
 services:
   db:
     image: mysql:5.7
-    container_name: firstshift-db
-    restart: always
+    platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-firstshift}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-firstshift}
       MYSQL_USER: ${MYSQL_USER:-firstshift}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-firstshift}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:${DB_PORT:-3306}:3306"
     volumes:
       - firstshift_dbdata:/var/lib/mysql
     healthcheck:
