@@ -1,7 +1,7 @@
 import type { Locale } from "antd/lib/locale";
 import { useContext } from "react";
 import isPropValid from "@emotion/is-prop-valid";
-import styled, { StyleSheetManager } from "styled-components";
+import { StyleSheetManager } from "styled-components";
 
 import { ConfigProvider, theme } from "antd";
 import "./dayjsInit";
@@ -39,19 +39,9 @@ export default function App() {
           theme={visitLinkTheme(themeToken.token)}
           {...component}
         >
-          <AppContainer>
-            <RouterProvider router={router} />
-          </AppContainer>
+          <RouterProvider router={router} />
         </ConfigProvider>
       </StyleSheetManager>
     </I18nextProvider>
   );
 }
-
-const AppContainer = styled.div`
-  display: flex;
-  width: 100%;
-  min-width: 1100px;
-  height: 100vh;
-  flex-direction: column;
-`;

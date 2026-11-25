@@ -2,6 +2,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import RequireAuth from "@/components/RequireAuth";
 import Layout from "./Layout";
+import firstshiftRoute from "./firstshift/routes";
 import React from "react";
 
 const SignIn = React.lazy(() => import("@/pages/SignIn"));
@@ -20,6 +21,7 @@ const Curriculum = React.lazy(() => import("@/pages/Curriculum/Curriculum"));
 const Profiles = React.lazy(() => import("@/pages/Profiles"));
 
 const router = createBrowserRouter([
+  firstshiftRoute,
   {
     path: "/",
     Component: Layout,

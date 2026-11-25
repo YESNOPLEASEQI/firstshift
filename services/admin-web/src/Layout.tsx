@@ -58,7 +58,7 @@ const Layout: React.FC = () => {
   }
 
   return (
-    <>
+    <AdminShell>
       <Header
         username={user.realName}
         role={Role[user.role as keyof typeof Role]}
@@ -79,9 +79,17 @@ const Layout: React.FC = () => {
           </Main>
         </Suspense>
       </RouteContainer>
-    </>
+    </AdminShell>
   );
 };
+
+const AdminShell = styled.div`
+  display: flex;
+  width: 100%;
+  min-width: 1100px;
+  height: 100vh;
+  flex-direction: column;
+`;
 
 const RouteContainer = styled.div`
   display: flex;
