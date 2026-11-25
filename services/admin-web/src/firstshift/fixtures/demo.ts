@@ -215,25 +215,15 @@ export const initialPassportItems: PassportItem[] = [
 
 export const demoRequest: HelpRequest = {
   id: "req-demo-1",
+  reference: "SR-001",
+  title: "整理货架 · 货架位置与说明不一致",
   barrier: "mismatch",
   barrierLabel: "说明与实际看到的不一样",
   wishes: ["希望看新旧位置对照图", "希望有人现场示范一次"],
   note: "货架标签换了位置，我有点不确定应该放哪里。",
-  createdAt: "2026-11-24 10:20",
-  status: "prepared",
-  timeline: [
-    { at: "2026-11-24 10:20", label: "我提出了请求" },
-    {
-      at: "2026-11-24 14:05",
-      label: "责任方已确认",
-      note: "岗位导师确认 B1 位置属实。",
-    },
-    {
-      at: "2026-11-25 09:30",
-      label: "支持已准备，等待你复核",
-      note: "辅导员更新了新旧位置对照图。",
-    },
-  ],
+  createdAt: "2026-11-25 10:20",
+  status: "submitted",
+  timeline: [{ at: "2026-11-25 10:20", label: "我提出了请求" }],
 };
 
 export const demoContacts = [

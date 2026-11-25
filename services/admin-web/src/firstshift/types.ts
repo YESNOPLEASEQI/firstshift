@@ -141,6 +141,10 @@ export interface RequestEvent {
 
 export interface HelpRequest {
   id: string;
+  /** Coach-side reference shown in the support queue. Synthetic in the demo. */
+  reference?: string;
+  /** Task the request belongs to, as shown to the coach. */
+  title?: string;
   barrier: string;
   barrierLabel: string;
   wishes: string[];

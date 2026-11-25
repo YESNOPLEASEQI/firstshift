@@ -2,6 +2,7 @@
 import React from "react";
 import type { RouteObject } from "react-router-dom";
 import EmployeeLayout from "./components/EmployeeLayout";
+import CoachLayout from "./coach/CoachLayout";
 
 const Home = React.lazy(() => import("./pages/employee/Home"));
 const Jobs = React.lazy(() => import("./pages/employee/Jobs"));
@@ -19,6 +20,14 @@ const HelpRequest = React.lazy(() => import("./pages/employee/HelpRequest"));
 const HelpRequests = React.lazy(() => import("./pages/employee/HelpRequests"));
 const Settings = React.lazy(() => import("./pages/employee/Settings"));
 const NotFound = React.lazy(() => import("./pages/employee/NotFound"));
+
+const CoachDashboard = React.lazy(() => import("./pages/coach/Dashboard"));
+const CoachTasks = React.lazy(() => import("./pages/coach/Tasks"));
+const CoachEditor = React.lazy(() => import("./pages/coach/Editor"));
+const CoachReviews = React.lazy(() => import("./pages/coach/Reviews"));
+const CoachReviewDetail = React.lazy(() => import("./pages/coach/ReviewDetail"));
+const CoachRequests = React.lazy(() => import("./pages/coach/Requests"));
+const CoachAccess = React.lazy(() => import("./pages/coach/Access"));
 
 // Employee-facing demo. No auth guard by design; all data is local synthetic demo data.
 const firstshiftRoute: RouteObject = {
@@ -44,4 +53,24 @@ const firstshiftRoute: RouteObject = {
   ],
 };
 
-export default firstshiftRoute;
+// Coach-side demo shares the same local data set. Also no auth guard.
+const coachRoute: RouteObject = {
+  path: "/firstshift/coach",
+  Component: CoachLayout,
+  children: [
+    { index: true, Component: CoachDashboard },
+    { path: "tasks", Component: CoachTasks },
+    { path: "editor", Component: CoachEditor },
+    { path: "editor/:taskId", Component: CoachEditor },
+    { path: "reviews", Component: CoachReviews },
+    { path: "reviews/:taskId", Component: CoachReviewDetail },
+    { path: "requests", Component: CoachRequests },
+    { path: "access", Component: CoachAccess },
+    { path: "*", Component: NotFound },
+  ],
+};
+
+// One pathless wrapper keeps the shared Router.tsx untouched.
+const firstshiftRoutes: RouteObject = { children: [coachRoute, firstshiftRoute] };
+
+export default firstshiftRoutes;
