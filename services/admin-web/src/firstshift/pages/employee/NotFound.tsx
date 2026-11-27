@@ -1,22 +1,23 @@
 import { Link } from "react-router-dom";
-import { PageHeader, useDocumentTitle } from "../../components/ui";
+import { useDocumentTitle } from "../../components/ui";
+import { EmptyCard } from "../../components/v3";
 
 export default function NotFound() {
   useDocumentTitle("页面不存在");
   return (
-    <div className="fs-stack">
-      <PageHeader
-        title="页面不存在"
-        titleId="fs-nf-title"
-      />
-      <div className="fs-actions">
-        <Link className="fs-btn fs-btn--primary" to="/firstshift">
-          回到开场页
-        </Link>
-        <Link className="fs-btn fs-btn--secondary" to="/firstshift/work">
-          查看我的工作
-        </Link>
-      </div>
-    </div>
+    <EmptyCard
+      action={
+        <div className="v3-actions-stack">
+          <Link className="fs-btn fs-btn--primary fs-btn--block" to="/firstshift">
+            回到首页
+          </Link>
+          <Link className="fs-btn fs-btn--secondary fs-btn--block" to="/firstshift/work">
+            查看我的工作
+          </Link>
+        </div>
+      }
+    >
+      没有找到这个页面。
+    </EmptyCard>
   );
 }

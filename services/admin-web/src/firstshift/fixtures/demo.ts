@@ -14,9 +14,9 @@ export const DEMO_USER_NAME = "小林";
 
 export const demoJob: JobExample = {
   id: "retail-community",
-  title: "社区零售门店 · 理货",
-  kicker: "岗位样本 · 合成演示",
-  summary: "在小型社区门店核对商品名称，把轻量商品放到对应货架，并检查位置。",
+  title: "超市理货员",
+  kicker: "社区零售门店 · 演示岗位",
+  summary: "整理商品，让货架保持整齐。检查商品包装和标签。",
   workContent: [
     "看商品包装上的名称。",
     "找到名称相同的货架标签。",
@@ -24,9 +24,7 @@ export const demoJob: JobExample = {
     "对照标签再检查一遍。",
   ],
   environmentKnown: [
-    "室内工作，有货架、通道和备货台。",
-    "可能会有顾客和其他同事经过。",
-    "需要短时间站立和搬动轻量包装。",
+    "在超市或零售门店工作，可能遇到顾客和同事。",
   ],
   environmentUnknown: [
     "具体工作时间与休息安排需要和真实门店确认。",
@@ -35,7 +33,7 @@ export const demoJob: JobExample = {
   ],
   typicalTasks: ["核对商品标签", "整理轻量商品", "把商品放到指定位置"],
   supports: [
-    "一次给一个步骤的图文说明。",
+    "图片说明、工作步骤、同事指导。",
     "需要时可以查看商品和货架的图片说明。",
     "不清楚时可以暂停并请人示范。",
     "可以把自己的支持偏好分享给辅导员。",
@@ -144,7 +142,7 @@ export const scenarioV2: Scenario = {
 
 export const demoChange: PublishedChange = {
   id: "chg-1",
-  title: "燕麦片从 A2 移到 B1",
+  title: "货架位置变更",
   summary:
     "今天门店调整了货架：燕麦片原来在 A2，现在移到 B1。米仍然在 A1。检查商品和一般核对方法不受影响。",
   fromVersion: "v1",
@@ -194,42 +192,89 @@ export const demoChange: PublishedChange = {
 
 export const initialPassportItems: PassportItem[] = [
   {
+    id: "p-goal-1",
+    category: "goal",
+    label: "工作目标",
+    value: "尝试超市理货工作。",
+  },
+  {
     id: "p-explain-1",
     category: "explain",
     label: "解释方式",
-    value: "一次只给我一个步骤。",
+    value: "每次告诉我一个步骤。",
   },
   {
     id: "p-format-1",
     category: "format",
     label: "说明方式",
-    value: "希望配一张真实货架照片。",
+    value: "给我看照片。",
   },
   {
     id: "p-help-1",
     category: "help",
     label: "求助方式",
-    value: "不明白时，先让我自己重看说明，再请人示范。",
+    value: "让我重新看一遍说明。",
+  },
+  {
+    id: "p-help-2",
+    category: "help",
+    label: "求助方式",
+    value: "请同事给我演示。",
   },
 ];
 
 export const demoRequest: HelpRequest = {
   id: "req-demo-1",
   reference: "SR-001",
-  title: "整理货架 · 货架位置与说明不一致",
+  title: "货架位置不一样",
   barrier: "mismatch",
   barrierLabel: "说明与实际看到的不一样",
   wishes: ["希望看新旧位置对照图", "希望有人现场示范一次"],
   note: "货架标签换了位置，我有点不确定应该放哪里。",
   createdAt: "2026-11-25 10:20",
-  status: "submitted",
-  timeline: [{ at: "2026-11-25 10:20", label: "我提出了请求" }],
+  status: "confirmed",
+  timeline: [
+    { at: "2026-11-25 10:20", label: "我提出了请求" },
+    { at: "2026-11-25 10:40", label: "辅导员已确认收到" },
+  ],
+};
+
+export const demoPreparedRequest: HelpRequest = {
+  id: "req-demo-2",
+  reference: "SR-002",
+  title: "看不懂工作说明",
+  barrier: "dont-understand",
+  barrierLabel: "我看不懂这一步",
+  wishes: ["给我新的图片说明"],
+  note: "步骤说明里写的和现场不太一样，我担心放错。",
+  createdAt: "2026-11-24 15:10",
+  status: "prepared",
+  timeline: [
+    { at: "2026-11-24 15:10", label: "我提出了请求" },
+    { at: "2026-11-25 09:10", label: "辅导员准备好了帮助" },
+  ],
 };
 
 export const demoContacts = [
-  { role: "岗位导师", name: "王师傅（虚构）", note: "演示联系人，不做真实通知" },
-  { role: "就业辅导员", name: "陈老师（虚构）", note: "演示联系人，不做真实通知" },
+  {
+    id: "coach",
+    role: "就业辅导员",
+    name: "陈老师（虚构）",
+    note: "演示联系人，不做真实通知",
+    area: "就业支持",
+    description: "工作说明、支持偏好和求助处理。",
+  },
+  {
+    id: "mentor",
+    role: "岗位导师",
+    name: "王师傅（虚构）",
+    note: "演示联系人，不做真实通知",
+    area: "门店指导",
+    description: "现场示范、工作步骤和门店安排。",
+  },
 ];
+
+export const demoChanges = [demoChange];
 
 export const demoWorkSteps = taskV2.steps.map((step) => ({
   ...step,

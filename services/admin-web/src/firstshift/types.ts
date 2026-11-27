@@ -154,7 +154,11 @@ export interface HelpRequest {
   timeline: RequestEvent[];
 }
 
+export type FontScale = "standard" | "large" | "larger";
+
 export interface Settings {
+  fontScale: FontScale;
+  /** Legacy fields kept so existing coach permissions and stored data stay compatible. */
   largeText: boolean;
   highContrast: boolean;
   reducedMotion: boolean;
@@ -162,24 +166,23 @@ export interface Settings {
 
 export const CATEGORY_LABELS: Record<PassportCategory, string> = {
   goal: "我的工作目标",
-  explain: "希望怎样解释任务",
-  format: "更容易理解的说明方式",
-  help: "遇到困难时希望怎样获得帮助",
+  explain: "我喜欢的工作说明",
+  format: "我喜欢的工作说明",
+  help: "我希望得到的帮助",
 };
 
 export const BARRIER_OPTIONS = [
-  { id: "dont-understand", label: "我不理解这一步" },
-  { id: "mismatch", label: "说明与实际看到的不一样" },
-  { id: "environment-change", label: "工作环境发生了变化" },
-  { id: "need-different-support", label: "我需要不同的辅助方式" },
-  { id: "other", label: "其他情况" },
+  { id: "dont-understand", label: "我看不懂这一步" },
+  { id: "mismatch", label: "说明和实际情况不一样" },
+  { id: "environment-change", label: "工作环境变了" },
+  { id: "need-different-support", label: "我需要其他帮助" },
 ] as const;
 
 export const WISH_OPTIONS = [
-  "希望有人现场示范一次",
-  "希望看新旧位置对照图",
-  "希望有人陪我做完这一步",
-  "希望能换个时间再尝试",
+  "给我新的图片说明",
+  "再解释一次",
+  "请同事给我演示",
+  "其他",
 ] as const;
 
 export const HINT_LABELS: Record<Hint, string> = {

@@ -48,6 +48,20 @@ describe("independent practice model", () => {
     expect(session.selected).toBeNull();
   });
 
+  it("lets a paused session end or exit without resuming first", () => {
+    let session = startSession(scenarioV1);
+    session = run(session, { type: "pause" });
+    session = run(session, { type: "end", outcome: "stopped" });
+    expect(session.status).toBe("ended");
+    expect(session.outcome).toBe("stopped");
+
+    let exited = startSession(scenarioV1);
+    exited = run(exited, { type: "pause" });
+    exited = run(exited, { type: "exit" });
+    expect(exited.status).toBe("exited");
+    expect(exited.outcome).toBeNull();
+  });
+
   it("supports resume, undo and partial review", () => {
     let session = startSession(scenarioV1);
     session = run(session, { type: "choose-item", id: "oats-1" });

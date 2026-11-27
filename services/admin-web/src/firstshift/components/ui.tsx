@@ -39,7 +39,9 @@ export type IconName =
   | "external"
   | "search"
   | "menu"
-  | "clock";
+  | "clock"
+  | "type"
+  | "shield";
 
 const ICON_PATHS: Record<IconName, ReactNode> = {
   arrow: <path d="M4 12h15m-6-6 6 6-6 6" />,
@@ -167,6 +169,13 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
     <>
       <circle cx="12" cy="12" r="9" />
       <path d="M12 7v5l3 2" />
+    </>
+  ),
+  type: <path d="M3 19 9 5l6 14M5.5 13h7M16 10h5m-2.5 0v9" />,
+  shield: (
+    <>
+      <path d="M12 3 4 6v6c0 4 3 7 8 9 5-2 8-5 8-9V6l-8-3Z" />
+      <path d="m9 12 2 2 4-4" />
     </>
   ),
 };

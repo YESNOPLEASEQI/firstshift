@@ -49,6 +49,22 @@ export function reduceSession(
       ? { ...session, status: "active", message: "继续上次的练习，已经放好的商品仍然保留。" }
       : session;
   }
+  if (action.type === "pause") {
+    return session.status === "active"
+      ? { ...session, status: "paused", message: "练习已暂停。进度保存在这台设备上，可以稍后继续。" }
+      : session;
+  }
+  if (action.type === "exit") {
+    return { ...session, status: "exited", message: "已退出练习。进度保存在这台设备上。" };
+  }
+  if (action.type === "end") {
+    return {
+      ...session,
+      status: "ended",
+      outcome: action.outcome,
+      message: "已记录你的选择。没有成绩，也不需要完成全部步骤。",
+    };
+  }
   if (session.status !== "active") {
     return session;
   }
@@ -155,20 +171,6 @@ export function reduceSession(
         : [...session.hints, action.hint];
       return { ...session, hints, message: hintMessage(action.hint, session, scenario) };
     }
-    case "pause": {
-      return { ...session, status: "paused", message: "练习已暂停。进度保存在这台设备上，可以稍后继续。" };
-    }
-    case "exit": {
-      return { ...session, status: "exited", message: "已退出练习。进度保存在这台设备上。" };
-    }
-    case "end": {
-      return {
-        ...session,
-        status: "ended",
-        outcome: action.outcome,
-        message: "已记录你的选择。没有成绩，也不需要完成全部步骤。",
-      };
-    }
     default:
       return session;
   }
@@ -202,6 +204,21 @@ export function hintSummary(session: Session): string[] {
   return session.hints.map((hint) =>
     hint === "work-order" ? "查看工作单" : hint === "photo" ? "查看图片提示" : "查看示范",
   );
+}
+
+export function outcomeStatus(outcome: Outcome | null): string {
+  switch (outcome) {
+    case "confirmed":
+      return "已完成";
+    case "needs-help":
+      return "还需要帮助";
+    case "unsure":
+      return "不确定";
+    case "stopped":
+      return "暂时停止";
+    default:
+      return "没有完成";
+  }
 }
 
 export function outcomeLabel(outcome: Outcome | null): string {

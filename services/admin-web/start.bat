@@ -19,10 +19,10 @@ if not exist "node_modules" (
   )
 )
 
-echo Starting the dev server. The browser will open http://localhost:3000/firstshift
+echo Starting the dev server. The browser will open http://localhost:5183/firstshift
 echo Close this window to stop the server.
 echo.
-call "node_modules\.bin\vite.cmd" --open /firstshift
+call "node_modules\.bin\vite.cmd" --port 5183 --open /firstshift
 
 echo.
 echo Server stopped.

@@ -9,7 +9,7 @@ import type {
   Settings,
   ShareConfig,
 } from "../types";
-import { demoRequest, initialPassportItems, scenarioV1, scenarioV2 } from "../fixtures/demo";
+import { demoPreparedRequest, demoRequest, initialPassportItems, scenarioV1, scenarioV2 } from "../fixtures/demo";
 import { reduceSession, startSession } from "../simulation/model";
 
 export type PracticeVersion = "v1" | "v2";
@@ -26,12 +26,15 @@ interface DemoState {
   passportItems: PassportItem[];
   passportUpdatedAt: string | null;
   lastShare: ShareConfig | null;
+  shareHistory: ShareConfig[];
   requests: HelpRequest[];
   changeDecision: "understood" | "not-applicable" | null;
+  readChangeIds: string[];
 
   setSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   startPractice: (version: PracticeVersion, restart?: boolean) => void;
   dispatchPractice: (action: SessionAction) => Session | null;
+  deletePractice: () => void;
   saveFeedbackItems: (items: Omit<PassportItem, "id">[]) => { ok: boolean };
   replacePassportItems: (items: PassportItem[]) => { ok: boolean };
   deletePassportItem: (id: string) => { ok: boolean };
@@ -41,7 +44,9 @@ interface DemoState {
     id?: string;
   };
   setRequestStatus: (id: string, status: RequestStatus, note?: string) => void;
+  addRequestNote: (id: string, note: string) => void;
   acknowledgeChange: (decision: "understood" | "not-applicable") => void;
+  markChangeRead: (id: string) => void;
   resetDemoData: () => void;
 }
 
@@ -63,20 +68,25 @@ function storageAvailable(): boolean {
   }
 }
 
-const freshRequests = (): HelpRequest[] => [
-  { ...demoRequest, timeline: demoRequest.timeline.map((event) => ({ ...event })) },
-];
+const cloneRequest = (request: HelpRequest): HelpRequest => ({
+  ...request,
+  timeline: request.timeline.map((event) => ({ ...event })),
+});
+
+const freshRequests = (): HelpRequest[] => [cloneRequest(demoRequest), cloneRequest(demoPreparedRequest)];
 
 export const useDemoStore = create<DemoState>()(
   persist(
     (set, get) => ({
-      settings: { largeText: false, highContrast: false, reducedMotion: false },
+      settings: { fontScale: "standard", largeText: false, highContrast: false, reducedMotion: false },
       practice: null,
       passportItems: initialPassportItems.map((item) => ({ ...item })),
       passportUpdatedAt: null,
       lastShare: null,
+      shareHistory: [],
       requests: freshRequests(),
       changeDecision: null,
+      readChangeIds: [],
 
       setSetting: (key, value) =>
         set((state) => ({ settings: { ...state.settings, [key]: value } })),
@@ -120,6 +130,8 @@ export const useDemoStore = create<DemoState>()(
         return session;
       },
 
+      deletePractice: () => set({ practice: null }),
+
       saveFeedbackItems: (items) => {
         if (!storageAvailable()) return { ok: false };
         const existing = get().passportItems;
@@ -150,7 +162,10 @@ export const useDemoStore = create<DemoState>()(
 
       recordShare: (config) => {
         if (!storageAvailable()) return { ok: false };
-        set({ lastShare: config });
+        set({
+          lastShare: config,
+          shareHistory: [config, ...get().shareHistory].slice(0, 20),
+        });
         return { ok: true };
       },
 
@@ -194,7 +209,31 @@ export const useDemoStore = create<DemoState>()(
         });
       },
 
+      addRequestNote: (id, note) => {
+        const trimmed = note.trim();
+        if (!trimmed) return;
+        set({
+          requests: get().requests.map((request) =>
+            request.id === id
+              ? {
+                  ...request,
+                  timeline: [
+                    ...request.timeline,
+                    { at: nowLabel(), label: "我补充了说明", note: trimmed },
+                  ],
+                }
+              : request,
+          ),
+        });
+      },
+
       acknowledgeChange: (decision) => set({ changeDecision: decision }),
+
+      markChangeRead: (id) => {
+        const current = get().readChangeIds;
+        if (current.includes(id)) return;
+        set({ readChangeIds: [...current, id] });
+      },
 
       resetDemoData: () =>
         set({
@@ -202,22 +241,55 @@ export const useDemoStore = create<DemoState>()(
           passportItems: initialPassportItems.map((item) => ({ ...item })),
           passportUpdatedAt: null,
           lastShare: null,
+          shareHistory: [],
           requests: freshRequests(),
           changeDecision: null,
+          readChangeIds: [],
         }),
     }),
     {
       name: "firstshift.demo.v1",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => window.localStorage),
+      migrate: (persisted, version) => {
+        const state = persisted as Partial<DemoState> & {
+          settings?: Partial<Settings>;
+        };
+        if (version < 2) {
+          const large = Boolean(state.settings?.largeText);
+          state.settings = {
+            fontScale: large ? "large" : "standard",
+            largeText: large,
+            highContrast: Boolean(state.settings?.highContrast),
+            reducedMotion: Boolean(state.settings?.reducedMotion),
+          };
+          state.readChangeIds = [];
+          state.shareHistory = [];
+        }
+        return state;
+      },
+      merge: (persisted, current) => {
+        const state = persisted as Partial<DemoState> & {
+          settings?: Partial<Settings>;
+        };
+        return {
+          ...current,
+          ...state,
+          settings: { ...current.settings, ...state.settings },
+          readChangeIds: state.readChangeIds ?? current.readChangeIds,
+          shareHistory: state.shareHistory ?? current.shareHistory,
+        };
+      },
       partialize: (state) => ({
         settings: state.settings,
         practice: state.practice,
         passportItems: state.passportItems,
         passportUpdatedAt: state.passportUpdatedAt,
         lastShare: state.lastShare,
+        shareHistory: state.shareHistory,
         requests: state.requests,
         changeDecision: state.changeDecision,
+        readChangeIds: state.readChangeIds,
       }),
     },
   ),

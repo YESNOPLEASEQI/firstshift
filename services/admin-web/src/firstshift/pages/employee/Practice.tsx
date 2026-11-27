@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { PackageArt } from "../../components/art";
 import { ShelfScene } from "../../components/ShelfScene";
@@ -22,12 +22,24 @@ export default function Practice() {
   const dispatch = useDemoStore((state) => state.dispatchPractice);
   const [pauseOpen, setPauseOpen] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
+  const resumeOnMount = useRef(
+    practice?.session.status === "paused" || practice?.session.status === "exited",
+  );
+
+  useEffect(() => {
+    if (!resumeOnMount.current) return;
+    resumeOnMount.current = false;
+    dispatch({ type: "resume" });
+  }, [dispatch]);
 
   if (taskId !== "demo-stock") {
     return <Navigate to="/firstshift/practice" replace />;
   }
   if (!practice) {
     return <Navigate to="/firstshift/practice" replace />;
+  }
+  if (practice.session.status === "ended") {
+    return <Navigate to="/firstshift/practice/demo-stock/feedback" replace />;
   }
 
   const scenario = practice.scenarioVersion === "v2" ? scenarioV2 : scenarioV1;
@@ -80,29 +92,18 @@ export default function Practice() {
 
   return (
     <div className="fs-stack fs-stack--tight">
-      <div className="fs-practice__top">
-        <div>
-          <Link to="/firstshift/practice" className="fs-backlink">
-            <Icon name="back" size={20} />
-            返回准备页
-          </Link>
-          <h1 className="fs-h2" id="fs-practice-title" tabIndex={-1} style={{ fontSize: "1.5rem" }}>
-            整理货架
-          </h1>
-        </div>
-        <div className="fs-actions">
-          <Link className="fs-btn fs-btn--secondary" to="/firstshift/help/request?barrier=mismatch">
-            <Icon name="help" size={20} />
-            请求帮助
-          </Link>
-          <button type="button" className="fs-btn fs-btn--secondary" onClick={pauseAndOpen}>
-            <Icon name="pause" size={20} />
-            暂停
-          </button>
-          <button type="button" className="fs-btn fs-btn--ghost" onClick={() => setExitOpen(true)}>
-            退出
-          </button>
-        </div>
+      <div className="fs-practice__tools">
+        <Link className="fs-btn fs-btn--ghost" to="/firstshift/help/request?barrier=mismatch">
+          <Icon name="help" size={20} />
+          我需要帮助
+        </Link>
+        <button type="button" className="fs-btn fs-btn--ghost" onClick={pauseAndOpen}>
+          <Icon name="pause" size={20} />
+          暂停
+        </button>
+        <button type="button" className="fs-btn fs-btn--ghost" onClick={() => setExitOpen(true)}>
+          退出
+        </button>
       </div>
 
       <div className="fs-stepdots" role="img" aria-label={`第 ${step} 步，共 4 步`}>
@@ -266,7 +267,7 @@ export default function Practice() {
 
       <Dialog open={pauseOpen} title="练习已暂停" onClose={closePause}>
         <p className="fs-body">
-          进度保存在这台设备上，可以稍后从首页继续。没有时间限制，也不会因为暂停而扣分。
+          进度保存在这台设备上，可以稍后从「练习」继续。没有时间限制，也不会因为暂停而扣分。
         </p>
         <div className="fs-dialog__actions">
           <button type="button" className="fs-btn fs-btn--ghost" onClick={() => {
@@ -289,7 +290,7 @@ export default function Practice() {
 
       <Dialog open={exitOpen} title="退出当前练习？" onClose={() => setExitOpen(false)}>
         <p className="fs-body">
-          已经放好的商品和用过的提示会保存在这台设备上。需要时可以从首页「继续上次」恢复。
+          已经放好的商品和用过的提示会保存在这台设备上。需要时可以从「练习」继续。
         </p>
         <div className="fs-dialog__actions">
           <button type="button" className="fs-btn fs-btn--secondary" onClick={() => setExitOpen(false)}>
